@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "python-studies"
+version = "0.1.0"
+description = ""
+authors = ["Wilkne Maia <72803395+wilkneMaia@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+pandas = "^2.2.3"
+pyarrow = "^18.1.0"
+fastparquet = "^2024.11.0"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
