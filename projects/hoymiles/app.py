@@ -605,7 +605,7 @@
 #     df = load_data(uploaded_file)
 #     display_tabs(df)
 
-
+import numpy as np
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -632,6 +632,7 @@ def load_data(uploaded_file):
     df["Month"] = df["Date"].dt.month  # Adiciona a coluna do mês
     df["Month_Year"] = df["Date"].dt.strftime('%Y-%m')  # Adiciona a coluna Ano-Mês
     df["Year"] = df["Date"].dt.year  # Adiciona a coluna do ano
+    df["Week"] = df["Date"].dt.isocalendar().week  # Adiciona a coluna de semana do ano
     return df
 
 # Função genérica para gráficos de barras
@@ -789,13 +790,28 @@ def plot_quadrant_graph(filtered_data, selected_year):
 # Função para exibir gráfico de barras de energia por semana
 def plot_energy_by_week(df, selected_year):
     """Exibe gráfico de barras com a energia gerada por semana"""
-    # Adiciona a coluna de semana do ano
-    df["Week"] = df["Date"].dt.isocalendar().week
     # Filtrar os dados para o ano selecionado
     weekly_data = df[df["Year"] == selected_year].groupby("Week")["Energy"].sum().reset_index()
 
+    # Calcular a linha de tendência
+    x = weekly_data["Week"]
+    y = weekly_data["Energy"]
+    slope, intercept = np.polyfit(x, y, 1)
+
     # Criar gráfico de barras para energia gerada por semana
-    fig = create_bar_chart(weekly_data, "Week", "Energy", f"Energia Gerada por Semana ({selected_year})", "Semana", "Energia Gerada (kWh)")
+    fig = px.bar(weekly_data, x="Week", y="Energy", title=f"Energia Gerada por Semana ({selected_year})", labels={"Week": "Semana", "Energy": "Energia Gerada (kWh)"}, template="plotly_dark")
+
+    # Adicionar a linha de tendência
+    fig.add_trace(go.Scatter(x=x, y=slope * x + intercept, mode='lines', name='Tendência', line=dict(color='#ff5722', width=3, dash='solid')))
+
+    # Ajustar layout do gráfico
+    fig.update_layout(
+        title=dict(text=f"Energia Gerada por Semana ({selected_year})", x=0.5, font=dict(size=22, color="white")),
+        xaxis=dict(title="Semana", showgrid=False, tickmode='linear', ticks="outside", tickwidth=2, tickangle=45, tickfont=dict(color="#ffffff")),
+        yaxis=dict(title="Energia Gerada (kWh)", showgrid=True, zeroline=True, zerolinewidth=1, zerolinecolor="gray", tickfont=dict(color="#ffffff")),
+        plot_bgcolor="#181818", paper_bgcolor="#181818", margin=dict(l=40, r=40, t=40, b=40)
+    )
+
     st.plotly_chart(fig)
 
 # Função para exibir gráfico de linha de energia acumulada por semana
@@ -821,6 +837,46 @@ def plot_cumulative_energy_by_week(df, selected_year):
     )
 
     st.plotly_chart(fig_line)
+
+def plot_box_plot_by_week(df, selected_year):
+    """Exibe um gráfico de box plot para a energia gerada por semana"""
+    # Adiciona a coluna de semana do ano
+    df["Week"] = df["Date"].dt.isocalendar().week
+    # Filtrar os dados para o ano selecionado
+    weekly_data = df[df["Year"] == selected_year]
+
+    # Criar gráfico de box plot
+    fig_box = px.box(weekly_data, x="Week", y="Energy", title=f"Distribuição de Energia Gerada por Semana ({selected_year})",
+                     labels={"Week": "Semana", "Energy": "Energia Gerada (kWh)"}, template="plotly_dark")
+
+    fig_box.update_layout(
+        title=dict(text=f"Distribuição de Energia Gerada por Semana ({selected_year})", x=0.5, font=dict(size=22, color="white")),
+        xaxis=dict(title="Semana", showgrid=False, tickmode='linear', ticks="outside", tickwidth=2, tickangle=45, tickfont=dict(color="#ffffff")),
+        yaxis=dict(title="Energia Gerada (kWh)", showgrid=True, zeroline=True, zerolinewidth=1, zerolinecolor="gray", tickfont=dict(color="#ffffff")),
+        plot_bgcolor="#181818", paper_bgcolor="#181818", margin=dict(l=40, r=40, t=40, b=40)
+    )
+
+    st.plotly_chart(fig_box)
+
+def plot_area_by_week(df, selected_year):
+    """Exibe um gráfico de área para a energia gerada por semana"""
+    # Adiciona a coluna de semana do ano
+    df["Week"] = df["Date"].dt.isocalendar().week
+    # Filtrar os dados para o ano selecionado
+    weekly_data = df[df["Year"] == selected_year].groupby("Week")["Energy"].sum().reset_index()
+
+    # Criar gráfico de área
+    fig_area = px.area(weekly_data, x="Week", y="Energy", title=f"Energia Gerada por Semana ({selected_year})",
+                       labels={"Week": "Semana", "Energy": "Energia Gerada (kWh)"}, template="plotly_dark")
+
+    fig_area.update_layout(
+        title=dict(text=f"Energia Gerada por Semana ({selected_year})", x=0.5, font=dict(size=22, color="white")),
+        xaxis=dict(title="Semana", showgrid=False, tickmode='linear', ticks="outside", tickwidth=2, tickangle=45, tickfont=dict(color="#ffffff")),
+        yaxis=dict(title="Energia Gerada (kWh)", showgrid=True, zeroline=True, zerolinewidth=1, zerolinecolor="gray", tickfont=dict(color="#ffffff")),
+        plot_bgcolor="#181818", paper_bgcolor="#181818", margin=dict(l=40, r=40, t=40, b=40)
+    )
+
+    st.plotly_chart(fig_area)
 
 # Função para exibir gráfico de quadrantes (semanal)
 def plot_quadrant_by_week(filtered_data, selected_year):
@@ -855,26 +911,74 @@ def plot_quadrant_by_week(filtered_data, selected_year):
 
     st.plotly_chart(fig_quadrante)
 
+def display_weekly_performance_indicators(weekly_data):
+    """Exibe indicadores de desempenho semanal"""
+    total_energy = weekly_data["Energy"].sum()
+    avg_energy = weekly_data["Energy"].mean()
+    max_energy = weekly_data["Energy"].max()
+    min_energy = weekly_data["Energy"].min()
+    std_dev_energy = weekly_data["Energy"].std()
+
+    # Supondo que a eficiência ideal de geração seja 90% da capacidade máxima
+    ideal_energy = total_energy * 0.9
+    efficiency = (total_energy / ideal_energy) * 100 if ideal_energy > 0 else 0
+
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    with col1: st.metric(label="🔋 Total de Energia Gerada", value=f"{total_energy:,.2f} kWh", delta=f"+{total_energy - avg_energy:,.2f} kWh", delta_color="inverse")
+    with col2: st.metric(label="📊 Média de Energia Semanal", value=f"{avg_energy:,.2f} kWh")
+    with col3: st.metric(label="⚡ Máxima de Energia Semanal", value=f"{max_energy:,.2f} kWh")
+    with col4: st.metric(label="📉 Mínima de Energia Semanal", value=f"{min_energy:,.2f} kWh")
+    with col5: st.metric(label="📊 Desvio Padrão", value=f"{std_dev_energy:,.2f} kWh")
+    with col6: st.metric(label="💡 Eficiência (%)", value=f"{efficiency:,.2f}%")
+
+def plot_weekly_data_by_date(df, selected_date):
+    """Exibe gráfico de barras com a energia gerada na semana da data selecionada"""
+    # Filtrar os dados para a semana da data selecionada
+    selected_date = pd.to_datetime(selected_date)
+    selected_week = selected_date.isocalendar().week
+    selected_year = selected_date.year
+    weekly_data = df[(df["Year"] == selected_year) & (df["Week"] == selected_week)]
+
+    if not weekly_data.empty:
+        daily_data = weekly_data.groupby("Day")["Energy"].sum().reset_index()
+        st.write(f"📈 Dados de geração de energia para a semana {selected_week} do ano {selected_year}")
+
+        # Exibir gráficos
+        x = daily_data["Day"]
+        y = daily_data["Energy"]
+        slope, intercept = np.polyfit(x, y, 1)
+
+        display_performance_indicators(daily_data)
+        plot_energy_bar_chart(daily_data, x, slope, intercept)
+        plot_cumulative_energy_graph(daily_data)
+    else:
+        st.warning("⚠️ Nenhum dado disponível para esta semana.")
+
+
 # Função principal para exibir os gráficos
 def display_tabs(df):
     """Exibe os gráficos com base no filtro de Mês, Semana, Ano ou Total"""
     st.subheader("📅 Histórico de Dados")
     filter_option = st.sidebar.radio("Selecione a visualização", ["Dia", "Semana", "Mês", "Ano", "Total"])
 
-    # Barra lateral para selecionar o ano (se for Semana)
+    # Barra lateral para selecionar a data (se for Semana)
     if filter_option == "Semana":
-        selected_year = st.sidebar.selectbox("Selecione o ano", range(2021, 2026))
+        selected_date = st.sidebar.date_input("Selecione uma data para ver a semana correspondente", value=pd.to_datetime("2021-01-01"), key="selected_date")
+        selected_year = selected_date.year
         filtered_data = df[df["Year"] == selected_year]
 
         if not filtered_data.empty:
-            st.write(f"📈 Dados de geração de energia para o ano {selected_year}")
-            # Exibir os gráficos semanais
-            plot_energy_by_week(filtered_data, selected_year)
-            plot_cumulative_energy_by_week(filtered_data, selected_year)
-            plot_quadrant_by_week(filtered_data, selected_year)
+            # st.write(f"📈 Dados de geração de energia para o ano {selected_year}")
+            # # Exibir os gráficos semanais
+            # weekly_data = filtered_data.groupby("Week")["Energy"].sum().reset_index()
+            # display_weekly_performance_indicators(weekly_data)
+            # plot_energy_by_week(filtered_data, selected_year)
+            # plot_cumulative_energy_by_week(filtered_data, selected_year)
+            # plot_area_by_week(filtered_data, selected_year)
+            # plot_box_plot_by_week(filtered_data, selected_year)
 
-        else:
-            st.warning("⚠️ Nenhum dado disponível para este período.")
+            # Exibir dados da semana correspondente à data selecionada
+            plot_weekly_data_by_date(df, selected_date)
 
     elif filter_option == "Mês":
         col1, col2 = st.sidebar.columns(2)
