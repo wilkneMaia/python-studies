@@ -2069,6 +2069,17 @@ files = [
 windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
+name = "pymodbustcp"
+version = "0.3.0"
+description = "A simple Modbus/TCP library for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pyModbusTCP-0.3.0-py3-none-any.whl", hash = "sha256:8b0086fa7ed4bd1bf6956d56a0979937008c48091f052310ad8826647fe30180"},
+    {file = "pyModbusTCP-0.3.0.tar.gz", hash = "sha256:893a4d88f6a63af21bd35b2b22061355e74005ea27fefc104e8f9bdb4ce81a04"},
+]
+
+[[package]]
 name = "pyparsing"
 version = "3.2.1"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
@@ -2761,4 +2772,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "bedd10f532a7744f4958b543ee032e1bc45afe41f7f7659a87f469863a013611"
+content-hash = "dd227f4b41860fe7d497dbb56d0a2d22e42ea5e976281f44ca7007e640d35764"

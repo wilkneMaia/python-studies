@@ -863,7 +863,7 @@ def display_tabs(df):
 
     # Barra lateral para selecionar o ano (se for Semana)
     if filter_option == "Semana":
-        selected_year = st.sidebar.selectbox("Selecione o ano", range(2023, 2026))
+        selected_year = st.sidebar.selectbox("Selecione o ano", range(2021, 2026))
         filtered_data = df[df["Year"] == selected_year]
 
         if not filtered_data.empty:
@@ -879,7 +879,7 @@ def display_tabs(df):
     elif filter_option == "Mês":
         col1, col2 = st.sidebar.columns(2)
         with col1: selected_month = st.selectbox("Selecione o mês", range(1, 13), format_func=lambda x: f"{x:02d}")
-        with col2: selected_year = st.selectbox("Selecione o ano", range(2023, 2026))
+        with col2: selected_year = st.selectbox("Selecione o ano", range(2021, 2026))
         filtered_data = df[(df["Year"] == selected_year) & (df["Month"] == selected_month)]
 
         if not filtered_data.empty:
@@ -897,7 +897,7 @@ def display_tabs(df):
             st.warning("⚠️ Nenhum dado disponível para este período.")
 
     elif filter_option == "Ano":
-        selected_year = st.sidebar.selectbox("Selecione o ano", range(2023, 2026))
+        selected_year = st.sidebar.selectbox("Selecione o ano", range(2021, 2026))
         filtered_data = df[df["Year"] == selected_year]
 
         if not filtered_data.empty:
