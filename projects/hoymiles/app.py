@@ -91,28 +91,28 @@ def display_tabs(df):
     elif filter_option == "Total":
         st.markdown("<h3>📊 Resumo Total</h3>", unsafe_allow_html=True)
 
-    # Criar colunas para exibir os displays lado a lado
-    col1, col2, col3 = st.columns(3)
+        # Criar colunas para exibir os displays lado a lado
+        col1, col2, col3 = st.columns(3)
 
-    with col1:
-        display_total_performance_indicators_3(df)  # Exibe o resumo total de energia
-    with col2:
-        display_revenue_summary_3(df)  # Exibe a receita da usina
-    with col3:
-        display_environmental_benefits_3(df)  # Exibe os benefícios ambientais
+        with col1:
+            display_total_performance_indicators_3(df)  # Exibe o resumo total de energia
+        with col2:
+            display_revenue_summary_3(df)  # Exibe a receita da usina
+        with col3:
+            display_environmental_benefits_3(df)  # Exibe os benefícios ambientais
 
 
-        # display_total_performance_indicators_3(df)
-        # display_revenue_summary_3(df)
-        # display_environmental_benefits_3(df)
-        # # display_total_performance_indicators(df)
-        # # display_revenue_summary(df)
-        # # display_environmental_benefits(df)
-    plot_total_by_year(df)
-    plot_comparative_months_by_year_line(df)
-    plot_area_stack_by_year(df)
-    plot_scatter_by_year(df)
-    plot_candlestick_by_month(df)
+            # display_total_performance_indicators_3(df)
+            # display_revenue_summary_3(df)
+            # display_environmental_benefits_3(df)
+            # # display_total_performance_indicators(df)
+            # # display_revenue_summary(df)
+            # # display_environmental_benefits(df)
+        plot_total_by_year(df)
+        plot_comparative_months_by_year_line(df)
+        plot_area_stack_by_year(df)
+        plot_scatter_by_year(df)
+        plot_candlestick_by_month(df)
 
 if uploaded_file:
     df = load_data(uploaded_file)
